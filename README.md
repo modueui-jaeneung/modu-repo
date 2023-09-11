@@ -1,6 +1,6 @@
 # modu_jaeneoung 
 
-branch: main
+branch: deapsea
 
 애플리케이션 설계 구조 <br>
 
