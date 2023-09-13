@@ -1,7 +1,9 @@
-package com.modu.authorizationServer;
+package com.modu.authorizationServer.config;
 
+import com.modu.authorizationServer.filter.CustomLoginPageGeneratingFilter;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -31,7 +33,9 @@ import org.springframework.security.oauth2.server.authorization.settings.TokenSe
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -39,7 +43,10 @@ import java.util.Arrays;
 import java.util.UUID;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final CustomLoginPageGeneratingFilter loginPageGeneratingFilter;
 
     @Bean
     @Order(1)
@@ -73,7 +80,16 @@ public class SecurityConfig {
                 )
                 // Form login handles the redirect to the login page from the
                 // authorization server filter chain
-                .formLogin(Customizer.withDefaults());
+                .formLogin(form -> form
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("email")
+                        .passwordParameter("password")
+                        .failureForwardUrl("/login"))
+                .httpBasic().disable()
+                .rememberMe().disable()
+        ;
+
+        http.addFilterBefore(loginPageGeneratingFilter, DefaultLoginPageGeneratingFilter.class);
 
         return http.build();
     }
@@ -141,12 +157,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public OAuth2AuthorizationConsentService oAuth2AuthorizationConsentService() {
-        return new InMemoryOAuth2AuthorizationConsentService();
+    public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
+        return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
-        return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }
