@@ -1,5 +1,6 @@
 package com.modu.MemberServer.entity;
 
+import com.modu.MemberServer.dto.UpdateMemberDto;
 import com.modu.MemberServer.entity.enums.SocialType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -7,7 +8,9 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -43,11 +46,12 @@ public class Member {
 
     private String introduceMyself;
 
-    @OneToMany(mappedBy = "follow_id", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "fromMember", fetch = FetchType.LAZY)
+    private List<Follow> following = new ArrayList<>();
+
+    @OneToMany(mappedBy = "toMember", fetch = FetchType.LAZY)
     private List<Follow> followed = new ArrayList<>();
 
-    @OneToMany(mappedBy = "follow_id", fetch = FetchType.LAZY)
-    private List<Follow> following = new ArrayList<>();
 
     private int isDeleted;
 
@@ -63,18 +67,33 @@ public class Member {
             String introduceMyself
 
     ) {
-        Member member = new Member();
-        member.email = email;
-        member.socialType = socialType;
-        member.password = password;
-        member.nickname = nickname;
-        member.address = address;
+        this.email = email;
+        this.socialType = socialType;
+        this.password = password;
+        this.nickname = nickname;
+        this.address = address;
         LocalDateTime now = LocalDateTime.now();
-        member.createdAt = now;
-        member.updatedAt = now;
-        member.introduceMyself = introduceMyself;
-        member.isDeleted = 0;
-        member.followed = new ArrayList<>();
-        member.following = new ArrayList<>();
+        this.createdAt = now;
+        this.updatedAt = now;
+        this.introduceMyself = introduceMyself;
+        this.isDeleted = 0;
+    }
+
+    public Member updateMember(
+            String nickname,
+            String address,
+            String password,
+            String introduceMyself
+    ) {
+        this.nickname = nickname;
+        this.address = address;
+        this.password = password;
+        this.introduceMyself = introduceMyself;
+        this.updatedAt = LocalDateTime.now();
+        return this;
+    }
+
+    public void delete() {
+        this.isDeleted = 1;
     }
 }

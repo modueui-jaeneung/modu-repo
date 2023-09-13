@@ -9,5 +9,5 @@ import lombok.Data;
 public class LoginDto {
 
     private String email;
-    private SocialType socialType;
+    private String socialType;
 }
