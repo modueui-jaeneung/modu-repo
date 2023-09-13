@@ -13,7 +13,7 @@ public class Follow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "follow_id")
-    private Long followId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "followed")
@@ -27,7 +27,8 @@ public class Follow {
 
     public Follow() { }
 
-    public Follow createFollow(
+    // 생성 메서드
+    public Follow (
             Member fromMember,
             Member toMember
     ) {
@@ -37,6 +38,5 @@ public class Follow {
         follow.createdAt = LocalDateTime.now();
         fromMember.getFollowing().add(follow);
         toMember.getFollowed().add(follow);
-        return follow;
     }
 }

@@ -17,7 +17,7 @@ public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
-    private Long memberId;
+    private Long id;
 
     @NotNull
     private String email;
@@ -54,7 +54,7 @@ public class Member {
     public Member() {}
 
     // 생성 메서드
-    public Member createMember(
+    public Member(
             String email,
             SocialType socialType,
             String password,
@@ -76,6 +76,5 @@ public class Member {
         member.isDeleted = 0;
         member.followed = new ArrayList<>();
         member.following = new ArrayList<>();
-        return member;
     }
 }
