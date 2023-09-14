@@ -161,6 +161,7 @@ public class CustomLoginPageGeneratingFilter extends GenericFilterBean {
                 + "rel=\"stylesheet\" integrity=\"sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M\" crossorigin=\"anonymous\">\n");
         sb.append("    <link href=\"https://getbootstrap.com/docs/4.0/examples/signin/signin.css\" "
                 + "rel=\"stylesheet\" crossorigin=\"anonymous\"/>\n");
+        sb.append("    <link rel=\"icon\" href=\"data:,\"/>\n");
         sb.append("  </head>\n");
         sb.append("  <body>\n");
         sb.append("     <div class=\"container\">\n");

@@ -1,7 +1,7 @@
 package com.modu.MemberServer.controller;
 
 
-import com.modu.MemberServer.dto.LoginDto;
+import com.modu.MemberServer.dto.LoginRequestDto;
 import com.modu.MemberServer.dto.SignUpDto;
 import com.modu.MemberServer.dto.UpdateMemberDto;
 import com.modu.MemberServer.entity.Member;
@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,15 +29,15 @@ public class MemberController {
         return new ResponseEntity<>(new Message("회원가입 완료!"), HttpStatus.CREATED);
     }
 
-    // 로그인에서 회원을 인증하기 위하여 이메일과 소셜타입으로 회원조회 (회원ID 값 얻기)
+    // 로그인에서 회원을 인증하기 위하여 이메일과 소셜타입으로 회원조회 (회원ID, 비밀번호 값 얻기)
     // memberService에서 회원을 조회했는데 0건이 나온다면 NoSuchElementException 예외 던짐.
     // 컨트롤러가 받아서 400 으로 응답함
     @GetMapping("/members/id")
-    public ResponseEntity<LoginResponseDto> findMemberIdForLogin(@ModelAttribute LoginDto loginDto) {
+    public ResponseEntity<LoginResponseDto> findMemberIdForLogin(@ModelAttribute LoginRequestDto loginDto) {
         SocialType socialType = SocialType.valueOf(loginDto.getSocialType());
-        Long memberId = memberService.findByEmailAndSocialType(loginDto.getEmail(), socialType);
+        Member member = memberService.findByEmailAndSocialType(loginDto.getEmail(), socialType);
 
-        return new ResponseEntity<>(new LoginResponseDto(memberId), HttpStatus.OK);
+        return new ResponseEntity<>(new LoginResponseDto(member.getId(), member.getPassword()), HttpStatus.OK);
     }
 
 
@@ -92,5 +91,6 @@ public class MemberController {
     @AllArgsConstructor
     public class LoginResponseDto {
         Long id;
+        String encryptedPassword;
     }
 }

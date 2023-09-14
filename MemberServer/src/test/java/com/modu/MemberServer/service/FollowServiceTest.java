@@ -1,4 +1,4 @@
-package com.modu.MemberServer;
+package com.modu.MemberServer.service;
 
 import com.modu.MemberServer.dto.SignUpDto;
 import com.modu.MemberServer.entity.Follow;

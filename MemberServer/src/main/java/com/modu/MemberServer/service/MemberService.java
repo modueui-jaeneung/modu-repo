@@ -1,6 +1,5 @@
 package com.modu.MemberServer.service;
 
-import com.modu.MemberServer.dto.LoginDto;
 import com.modu.MemberServer.dto.SignUpDto;
 import com.modu.MemberServer.dto.UpdateMemberDto;
 import com.modu.MemberServer.entity.Follow;
@@ -56,9 +55,9 @@ public class MemberService {
         return savedMember.getId();
     }
 
-    public Long findByEmailAndSocialType(String email, SocialType socialType) {
+    public Member findByEmailAndSocialType(String email, SocialType socialType) {
         Member member = memberRepository.findByEmailAndSocialType(email, socialType).orElseThrow(() -> new NoSuchElementException("(이메일,소셜타입)과 일치하는 회원이 없습니다."));
-        return member.getId();
+        return member;
     }
 
     public Member findById(Long memberId) {

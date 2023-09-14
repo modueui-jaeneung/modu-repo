@@ -19,13 +19,13 @@ public class ExControllerAdvice {
     @ExceptionHandler(NoSuchElementException.class)
     public ErrorResult noSuchExHandle(NoSuchElementException e) {
         log.error("[exceptionHandle] ex", e);
-        return new ErrorResult("회원을 찾을 수 없음...", e.getMessage());
+        return new ErrorResult("회원을 찾을 수 없음...");
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException.class)
     public ErrorResult illegalExHandle(IllegalArgumentException e) {
         log.error("[exceptionHandle] ex", e);
-        return new ErrorResult("존재하지 않는 소셜타입...", e.getMessage());
+        return new ErrorResult("존재하지 않는 소셜타입...");
     }
 }
