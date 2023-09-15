@@ -1,0 +1,112 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}"
+          href="../css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            max-width: 800px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <div class="py-5 text-center">
+        <h2>채팅 페이지</h2>
+    </div>
+
+    <div class="container">
+        <div class="col-12">
+            <h1>[[${room.name}]]</h1>
+        </div>
+
+        <!--기존 메시지 화면에 띄우기-->
+        <th:block th:each="message : ${messages}">
+            <div class="col-12">
+                <div th:if="${message.writer} == ${username}" class='alert alert-warning'>
+                    <b th:text="|${message.writer} : ${message.message}|">채팅 메시지</b>
+                </div>
+                <div th:unless="${message.writer} == ${username}" class='alert alert-dark'>
+                    <b th:text="|${message.writer} : ${message.message}|">채팅 메시지</b>
+                </div>
+            </div>
+        </th:block>
+
+        <div>
+            <div id="msgArea" class="col"></div>
+            <div class="col-12">
+                <div class="input-group mb-3">
+                    <input type="text" id="msg" class="form-control">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="button-send">전송</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12"></div>
+    </div>
+</div> <!-- /container -->
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<script th:inline="javascript">
+    $(document).ready(function(){
+
+        var roomName = [[${room.name}]];
+        var roomId = [[${room.roomId}]];
+        var username = [[${username}]];
+
+        console.log(roomName + ", " + roomId + ", " + username);
+
+        //1. SockJS를 내부에 들고있는 stomp를 내어줌
+        var sockJs = new SockJS("/ws");
+        var stomp = Stomp.over(sockJs);
+
+        //2. connection이 맺어지면 실행
+        stomp.connect({}, function (){
+            console.log("STOMP Connection")
+
+            //4. subscribe(path, callback)으로 메세지를 받을 수 있음
+            stomp.subscribe("/topic/chat/room/" + roomId, function (chat) {
+                var content = JSON.parse(chat.body);
+
+                var writer = content.writer;
+                var str = '';
+                var message = content.message;
+
+                if(writer === username){
+                    str = "<div class='col-12'>";
+                    str += "<div class='alert alert-warning'>";
+                    str += "<b>" + writer + " : " + message + "</b>";
+                    str += "</div></div>";
+                    $("#msgArea").append(str);
+                }
+                else{
+                    str = "<div class='col-12'>";
+                    str += "<div class='alert alert-dark'>";
+                    str += "<b>" + writer + " : " + message + "</b>";
+                    str += "</div></div>";
+                    $("#msgArea").append(str);
+                }
+            });
+
+            //3. send(path, header, message)로 메세지를 보낼 수 있음
+            stomp.send('/app/chat/enter', {}, JSON.stringify({roomId: roomId, writer: username}))
+        });
+
+        $("#button-send").on("click", function(e){
+            var msg = document.getElementById("msg");
+
+            console.log(username + ":" + msg.value);
+            stomp.send('/app/chat/message', {}, JSON.stringify({roomId: roomId, message: msg.value, writer: username}));
+            msg.value = '';
+        });
+    });
+</script>
+
+</body>
+</html>
