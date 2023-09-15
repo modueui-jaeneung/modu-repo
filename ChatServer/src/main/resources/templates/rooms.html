@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}"
+          href="../css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container" style="max-width: 600px">
+    <div class="py-5 text-center">
+        <h2>채팅방 목록</h2>
+    </div>
+    <div class="row">
+        <div class="col">
+            <form th:action="@{/chat/room}" method="post">
+                <input type="text" name="name" class="form-control">
+                <button class="btn btn-primary float-end">채팅방 생성하기</button>
+            </form>
+        </div>
+    </div>
+    <hr class="my-4">
+    <div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>채팅방 ID</th>
+                <th>채팅방 Name</th>
+                <th>링크</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${items}">
+                <td th:text="${item.roomId}">룸 아이디</td>
+                <td th:text="${item.name}">채팅방 name</td>
+                <td><a href="item.html" th:href="@{|/chat/${item.roomId}|}" th:text="${item.name}">링크</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div> <!-- /container -->
+</body>
+</html>
