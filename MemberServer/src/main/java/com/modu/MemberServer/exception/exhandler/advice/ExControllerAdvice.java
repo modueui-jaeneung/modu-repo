@@ -1,6 +1,9 @@
 package com.modu.MemberServer.exception.exhandler.advice;
 
-import com.modu.MemberServer.controller.MemberController;
+import com.modu.MemberServer.exception.DuplicateMemberException;
+import com.modu.MemberServer.exception.EmailFormatNotSatisfiedException;
+import com.modu.MemberServer.exception.PasswordNotEqualException;
+import com.modu.MemberServer.exception.PasswordNotSatisfiedException;
 import com.modu.MemberServer.exception.exhandler.ErrorResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,15 +20,46 @@ public class ExControllerAdvice {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(NoSuchElementException.class)
-    public ErrorResult noSuchExHandle(NoSuchElementException e) {
+    public ErrorResult noSuchElementExHandle(NoSuchElementException e) {
         log.error("[exceptionHandle] ex", e);
-        return new ErrorResult("회원을 찾을 수 없음...");
+        return new ErrorResult(e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(DuplicateMemberException.class)
+    public ErrorResult duplicateMemberExHandle(DuplicateMemberException e) {
+        log.error("[exceptionHandle] ex", e);
+        return new ErrorResult(e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(PasswordNotEqualException.class)
+    public ErrorResult passwordNotEqualExHandle(PasswordNotEqualException e) {
+        log.error("[exceptionHandle] ex", e);
+        return new ErrorResult(e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException.class)
-    public ErrorResult illegalExHandle(IllegalArgumentException e) {
+    public ErrorResult illegalArgumentExHandle(IllegalArgumentException e) {
         log.error("[exceptionHandle] ex", e);
-        return new ErrorResult("존재하지 않는 소셜타입...");
+        return new ErrorResult(e.getMessage());
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(EmailFormatNotSatisfiedException.class)
+    public ErrorResult emailFormatNotSatisfiedExHandle(EmailFormatNotSatisfiedException e) {
+        log.error("[exceptionHandle] ex", e);
+        return new ErrorResult(e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(PasswordNotSatisfiedException.class)
+    public ErrorResult passwordNotSatisfiedExHandle(PasswordNotSatisfiedException e) {
+        log.error("[exceptionHandle] ex", e);
+        return new ErrorResult(e.getMessage());
+    }
+
+
+
 }

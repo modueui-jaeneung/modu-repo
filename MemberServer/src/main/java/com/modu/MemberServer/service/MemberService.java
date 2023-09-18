@@ -6,7 +6,9 @@ import com.modu.MemberServer.entity.Follow;
 import com.modu.MemberServer.entity.Member;
 import com.modu.MemberServer.entity.enums.SocialType;
 import com.modu.MemberServer.exception.DuplicateMemberException;
+import com.modu.MemberServer.exception.EmailFormatNotSatisfiedException;
 import com.modu.MemberServer.exception.PasswordNotEqualException;
+import com.modu.MemberServer.exception.PasswordNotSatisfiedException;
 import com.modu.MemberServer.repository.FollowRepository;
 import com.modu.MemberServer.repository.MemberRepository;
 import com.modu.MemberServer.utils.EncryptHelper;
@@ -36,11 +38,23 @@ public class MemberService {
             throw new PasswordNotEqualException("비밀번호가 일치하지 않습니다.");
         }
 
-        // TODO 이메일 중복 검사
-        if (memberRepository.findByEmailAndSocialType(signUpDto.getEmail(), SocialType.LOCAL).isPresent()) {
+        String email = signUpDto.getEmail();
+        // 이메일 중복 검사
+        if (memberRepository.findByEmailAndSocialType(email, SocialType.LOCAL).isPresent()) {
             throw new DuplicateMemberException("이미 존재하는 회원입니다.");
         }
-        // TODO 비밀번호 형식 검사하기
+
+        // 이메일 형식 검사
+        if (!email.matches("^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")) {
+            throw new EmailFormatNotSatisfiedException("이메일 형식이 올바르지 않습니다. 올바른 형식: 계정@도메인.최상위도메인");
+        }
+
+        String password = signUpDto.getPassword();
+        // 비밀번호 유효성 검사
+        // 최소 8자, 최소 하나의 문자, 하나의 숫자 및 하나의 특수 문자
+        if (!password.matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@!%*#?&])[A-Za-z\\d@!%*#?&]{8,}$")) {
+            throw new PasswordNotSatisfiedException("비밀번호가 유효하지 않습니다. 최소 8자, 최소 하나의 문자, 하나의 숫자 및 하나의 특수 문자가 들어있어야 합니다.");
+        }
 
         // TODO 이메일 인증하기
 

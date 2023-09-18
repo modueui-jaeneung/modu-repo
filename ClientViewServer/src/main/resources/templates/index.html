@@ -61,13 +61,33 @@
         // }
         //
         // hasAccessToken();
+
+        function loginTag() {
+            if (isAuthenticated()) {
+
+            } else {
+                document.querySelector("#isAuthenticated").remove();
+            }
+        }
+
+        function isAuthenticated() {isAuthenticated
+
+        }
+
+        loginTag();
     </script>
 </head>
 <body>
     <div>OAuth2.0 Client</div>
-    <div>
-        <a th:href="@{http://127.0.0.1:8081/oauth2/authorization/springOAuth2}">로그인</a>
+    <div id="login">
+        <div id="anonymous">
+            <a th:href="@{http://127.0.0.1:8081/oauth2/authorization/springOAuth2}">로그인</a>
+        </div>
+        <div id="isAuthenticated">
+            <h6>로그인 성공</h6>
+        </div>
     </div>
+
 
     <br />
 

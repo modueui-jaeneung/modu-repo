@@ -4,7 +4,9 @@ import com.modu.MemberServer.dto.SignUpDto;
 import com.modu.MemberServer.dto.UpdateMemberDto;
 import com.modu.MemberServer.entity.Member;
 import com.modu.MemberServer.exception.DuplicateMemberException;
+import com.modu.MemberServer.exception.EmailFormatNotSatisfiedException;
 import com.modu.MemberServer.exception.PasswordNotEqualException;
+import com.modu.MemberServer.exception.PasswordNotSatisfiedException;
 import com.modu.MemberServer.repository.FollowRepository;
 import com.modu.MemberServer.repository.MemberRepository;
 import com.modu.MemberServer.service.FollowService;
@@ -74,12 +76,28 @@ public class MemberServiceTest {
         memberService.signupLocal(signUpDto1);
         SignUpDto signUpDto2 = new SignUpDto(
                 "user@aaa.com",
-                "1234",
-                "1234",
+                "pass123!",
+                "pass123!",
                 "userrrrrr",
                 "addressssssss~"
         );
         assertThrows(DuplicateMemberException.class, () -> memberService.signupLocal(signUpDto2));
+    }
+
+    @Test
+    void 회원가입_LOCAL_가입실패_이메일형식안맞음() {
+        SignUpDto signUpDto = createSignUpDto();
+        signUpDto.setEmail("user.aaa.com");
+        assertThrows(EmailFormatNotSatisfiedException.class, () -> memberService.signupLocal(signUpDto));
+    }
+
+    @Test
+    void 회원가입_LOCAL_가입실패_비밀번호형식안맞음() {
+        SignUpDto signUpDto = createSignUpDto();
+        String password = "hellohellohello";
+        signUpDto.setPassword(password);
+        signUpDto.setRepeatPassword(password);
+        assertThrows(PasswordNotSatisfiedException.class, () -> memberService.signupLocal(signUpDto));
     }
 
     @Test
@@ -186,8 +204,8 @@ public class MemberServiceTest {
     private SignUpDto createSignUpDto() {
         return new SignUpDto(
                 "user@aaa.com",
-                "pass",
-                "pass",
+                "pass123!",
+                "pass123!",
                 "user",
                 "address~"
         );
