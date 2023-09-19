@@ -23,11 +23,16 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-
-	// 채팅 웹 서버 라이브러리 추가
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+	// 웹 소켓 라이브러리 추가
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	// 채팅 이력 저장 DB
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+	// spring data redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

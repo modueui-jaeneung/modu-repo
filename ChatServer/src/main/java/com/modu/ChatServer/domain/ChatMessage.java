@@ -22,7 +22,8 @@ public class ChatMessage {
     private String writer;
     private String message;
 
-    @CreatedDate
-    @Field("created_at")
-    private LocalDateTime createdAt;
+    // TODO: LocalDateTime 필드를 유지하기 위해, 나중에 MessageDto 추가하기
+//    @CreatedDate
+//    @Field("created_at")
+//    private LocalDateTime createdAt;
 }

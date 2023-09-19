@@ -8,7 +8,9 @@ spring:
       port: 27017
       authentication-database: admin
       database: test
-
+    redis:
+      host: localhost
+      port: 6379
 
 #logging:
 #  level:

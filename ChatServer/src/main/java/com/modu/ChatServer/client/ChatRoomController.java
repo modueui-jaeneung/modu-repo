@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -17,11 +19,21 @@ public class ChatRoomController {
     /**
      * 채팅방 목록 조회 (실제 우리 서비스에서 게시글 아래에 보일 채팅방 목록 정보 조회)
      */
-    @GetMapping
+    @GetMapping("/")
     public String rooms(Model model) {
         List<ChatRoom> rooms = chatRoomRepository.findAllRooms();
         model.addAttribute("items", rooms);
         return "rooms";
+    }
+
+    /**
+     * 채팅방 개설 (Json 형식 전달)
+     */
+    @PostMapping("/rooms")
+    public String createRoom(@RequestBody ChatRoom room) {
+        // TODO : JSON 형식으로 roomId, name 전달해서 POST 요청하면 ChatRoom 객체 생성
+        chatRoomRepository.save(room);
+        return "redirect:/";
     }
 
     /**
