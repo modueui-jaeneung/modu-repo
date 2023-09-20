@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,14 +29,11 @@ public class RedisConfig {
     @Value("${redis.pubsub.topic:chatting}")
     private String topic;
 
-    @Autowired
-    private RedisSubscriber redisSubscriber;
-
     /**
      * Redis Client로 사용할 lettuce 설정
      */
     @Bean
-    public LettuceConnectionFactory lettuceConnectionFactory() {
+    public RedisConnectionFactory lettuceConnectionFactory() {
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
         configuration.setHostName(host);
         configuration.setPort(port);
@@ -61,10 +59,12 @@ public class RedisConfig {
      * pub/sub 메시지 처리 Listeners 설정
      */
     @Bean
-    public RedisMessageListenerContainer redisContainer() {
+    public RedisMessageListenerContainer redisContainer(RedisConnectionFactory redisConnectionFactory,
+                                                        MessageListenerAdapter messageListener,
+                                                        ChannelTopic channelTopic) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(lettuceConnectionFactory());
-        container.addMessageListener(messageListener(), channelTopic());
+        container.setConnectionFactory(redisConnectionFactory);
+        container.addMessageListener(messageListener, channelTopic);
         return container;
     }
 
@@ -76,7 +76,7 @@ public class RedisConfig {
 
     // Message를 처리할 Listener 등록
     @Bean
-    MessageListenerAdapter messageListener() {
+    MessageListenerAdapter messageListener(RedisSubscriber redisSubscriber) {
         return new MessageListenerAdapter(redisSubscriber);
     }
 }
