@@ -19,7 +19,7 @@
 
     <div class="container">
         <div class="col-12">
-            <h1>[[${room.name}]]</h1>
+            <h1>[[${room.title}]]</h1>
         </div>
 
         <!--기존 메시지 화면에 띄우기-->
@@ -56,7 +56,7 @@
 <script th:inline="javascript">
     $(document).ready(function(){
 
-        var roomName = [[${room.name}]];
+        var roomName = [[${room.title}]];
         var roomId = [[${room.roomId}]];
         var username = [[${username}]];
 

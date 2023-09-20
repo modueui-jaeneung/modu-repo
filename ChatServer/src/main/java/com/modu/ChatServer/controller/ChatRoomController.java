@@ -1,10 +1,9 @@
 package com.modu.ChatServer.controller;
 
-import com.modu.ChatServer.client.ChatRoom;
-import com.modu.ChatServer.client.ChatRoomRepository;
 import com.modu.ChatServer.domain.ChatMessage;
+import com.modu.ChatServer.domain.ChatRoom;
 import com.modu.ChatServer.repository.ChatMessageRepository;
-import jakarta.annotation.PostConstruct;
+import com.modu.ChatServer.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -14,30 +13,35 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/chat")
-@Slf4j
-public class ChatController {
+public class ChatRoomController {
 
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
-
-    /**
-     * 채팅방 개설 (Json 형식 전달)
-     */
+    
+    // 채팅방 생성 (MongoDB)
     @PostMapping("/rooms")
     public String createRoom(@RequestBody ChatRoom room) {
-        // JSON 형식으로 roomId, name 전달해서 POST 요청하면 ChatRoom 객체 생성
         chatRoomRepository.save(room);
-        log.info("JSON 요청 : {}", room);
-        return "redirect:/chat";
+        return "redirect:/";
     }
 
-    // room id로 채팅방 입장
+    // 모든 채팅방 조회
+    @GetMapping
+    public String rooms(Model model) {
+        List<ChatRoom> rooms = chatRoomRepository.findAll();
+        model.addAttribute("items", rooms);
+        return "rooms";
+    }
+
+    // Room Id로 채팅방 조회
     @GetMapping("/{roomId}")
     public String getRoom(@PathVariable String roomId, Model model) {
-        ChatRoom room = chatRoomRepository.findRoomById(roomId);
+        ChatRoom room = chatRoomRepository.findById(roomId)
+                .orElseThrow(NullPointerException::new);
 
         // 이전 채팅 기록 TODO : html 코드 수정하기
         List<ChatMessage> messages = chatMessageRepository.findByRoomId(roomId);
@@ -49,4 +53,6 @@ public class ChatController {
         return "room";
     }
 
+
+    // 채팅방 삭제
 }

@@ -32,8 +32,8 @@
             <tbody>
             <tr th:each="item : ${items}">
                 <td th:text="${item.roomId}">룸 아이디</td>
-                <td th:text="${item.name}">채팅방 name</td>
-                <td><a href="item.html" th:href="@{|/chat/${item.roomId}|}" th:text="${item.name}">링크</a></td>
+                <td th:text="${item.title}">채팅방 Title</td>
+                <td><a href="item.html" th:href="@{|/chat/${item.roomId}|}" th:text="${item.title}">링크</a></td>
             </tr>
             </tbody>
         </table>
