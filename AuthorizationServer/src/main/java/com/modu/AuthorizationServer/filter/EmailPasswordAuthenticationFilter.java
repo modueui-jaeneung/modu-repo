@@ -51,13 +51,9 @@ public class EmailPasswordAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (!request.getRequestURI().equals(DEFAULT_API_LOGIN_URI)) {
+        if (!request.getRequestURI().equals(DEFAULT_API_LOGIN_URI) || !request.getMethod().equals("POST")) {
             filterChain.doFilter(request, response);
             return;
-        }
-
-        if (!request.getMethod().equals("POST")) {
-            throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         }
 
         String email = obtainEmail(request);

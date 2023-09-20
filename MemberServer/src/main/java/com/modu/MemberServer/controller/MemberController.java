@@ -24,7 +24,7 @@ public class MemberController {
 
     // 회원가입 -> 성공 시 201
     @PostMapping("/members")
-    public ResponseEntity<Message> signup(@RequestBody SignUpDto signUpDto) {
+    public ResponseEntity<Message> signup(@ModelAttribute SignUpDto signUpDto) {
         memberService.signupLocal(signUpDto);
         return new ResponseEntity<>(new Message("회원가입 완료!"), HttpStatus.CREATED);
     }

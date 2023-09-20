@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -19,6 +22,18 @@ import java.util.List;
 public class HomeController {
 
     private final RestTemplate restTemplate;
+
+    @GetMapping("/authentication")
+    public ResponseEntity<Message> authentication() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication instanceof JwtAuthenticationToken) {
+            // JWT 토큰으로 인증된 사용자
+            return new ResponseEntity<>(new Message("1"), HttpStatus.OK);
+        } else {
+            // 익명 사용자
+            return new ResponseEntity<>(new Message("0"), HttpStatus.OK);
+        }
+    }
 
     @GetMapping("/free")
     public ResponseEntity<Message> getFree() {

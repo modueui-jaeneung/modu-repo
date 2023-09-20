@@ -1,0 +1,84 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="*/*" charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <title>모두의재능 회원가입</title>
+    <link rel="stylesheet" href="../static/css/signup.css">
+    <script src="../static/js/signup.js"></script>
+</head>
+<body>
+
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container px-4 px-lg-5">
+            <a class="navbar-brand" th:href="@{/}">모두의 재능</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item"><a class="nav-link" href="http://localhost:8080/">게시판</a></li>
+                    <li class="nav-item"><a class="nav-link" href="http://localhost:8080/signup">회원가입</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id="app" class="bg-light">
+        <section class="modu">
+            <div class="title text-center border-box block">
+                <div class="title-content text-primary-emphasis fs-1 fw-bold">모두의 재능</div>
+            </div>
+            <div class="social-login mt-3">
+                <div class="social-login-text text-center text-body-secondary">
+                    <span>다른 서비스로 로그인</span>
+                </div>
+                <div class="social-login-list">
+                    <a class="naver" href="#!"></a>
+                    <a class="kakao" href="#!"></a>
+                    <a class="google" href="#!"></a>
+                </div>
+            </div>
+            <div class="else">
+                <div class="else-line"></div>
+                <div class="else-text text-center bg-light">
+                    <span>또는</span>
+                </div>
+            </div>
+            <form class="container" method="post" th:action="@{/signup}">
+                <div class="mb-3">
+                    <input type="email" class="form-control" name="email" id="email" placeholder="이메일">
+                    <p class="email-error" hidden>aaa</p>
+                </div>
+                <div class="mb-3">
+                    <input type="password" class="form-control" name="password" id="password" placeholder="비밀번호 (영문, 숫자, 특수문자 8~30자)">
+                </div>
+                <div class="mb-3">
+                    <input type="password" class="form-control" name="repeatPassword" id="repeatPassword" placeholder="비밀번호 확인">
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" name="nickname" id="nickname" placeholder="닉네임">
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" name="address" id="address" placeholder="주소">
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg btn-block login-button">회원가입</button>
+            </form>
+            <div class="already-member text-center">
+                <span>이미 계정이 있으세요?</span>
+                <a th:href="@{http://127.0.0.1:8081/oauth2/authorization/springOAuth2}">로그인</a>
+            </div>
+        </section>
+        <footer class="flex-box bg-white footer">
+            <div class="footer-inner">
+                <div>이용약관</div>
+                <div>모두의재능</div>
+                <div>한국어</div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

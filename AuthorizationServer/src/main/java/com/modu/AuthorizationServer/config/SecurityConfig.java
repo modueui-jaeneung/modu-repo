@@ -1,18 +1,16 @@
 package com.modu.authorizationServer.config;
 
-import com.modu.authorizationServer.filter.CustomLoginPageGeneratingFilter;
 import com.modu.authorizationServer.filter.EmailPasswordAuthenticationFilter;
 import com.modu.authorizationServer.provider.FormAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -26,7 +24,6 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
@@ -40,8 +37,6 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CsrfAuthenticationStrategy;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
-import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
-import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
 import java.time.Duration;
@@ -53,8 +48,6 @@ import java.util.UUID;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-
-    private final CustomLoginPageGeneratingFilter loginPageGeneratingFilter;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -71,7 +64,7 @@ public class SecurityConfig {
                 // authorization endpoint
                 .exceptionHandling((exceptions) -> exceptions
                         .defaultAuthenticationEntryPointFor(
-                                new LoginUrlAuthenticationEntryPoint("/login"),
+                                new LoginUrlAuthenticationEntryPoint("/loginmvc"),
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
                         )
                 )
@@ -83,10 +76,20 @@ public class SecurityConfig {
     }
 
     @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                .requestMatchers("/static/css/**", "/static/images/**");
+    }
+
+    @Bean
     @Order(2)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+
         http
                 .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers(HttpMethod.GET, "/loginmvc", "/test", "/api").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/login").anonymous()
+
                         .anyRequest().authenticated()
                 )
                 // Form login handles the redirect to the login page from the
@@ -98,29 +101,13 @@ public class SecurityConfig {
                 .httpBasic().disable()
                 .rememberMe().disable()
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
+                        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/loginmvc")))
         ;
 
-        http.addFilterBefore(loginPageGeneratingFilter, DefaultLoginPageGeneratingFilter.class);
-        http.addFilterAfter(emailPasswordAuthenticationFilter(), CustomLoginPageGeneratingFilter.class);
+        http.addFilterBefore(emailPasswordAuthenticationFilter(), DefaultLoginPageGeneratingFilter.class);
 
         return http.build();
     }
-
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//        UserDetails userDetails1 = User.withUsername("user")
-//                .password(passwordEncoder.encode("pass"))
-//                .roles("USER")
-//                .build();
-//        UserDetails userDetails2 = User.withUsername("admin")
-//                .password(passwordEncoder.encode("pass"))
-//                .roles("USER", "ADMIN")
-//                .build();
-//        return new InMemoryUserDetailsManager(userDetails1, userDetails2);
-//    }
-
-
 
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
@@ -146,6 +133,7 @@ public class SecurityConfig {
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .redirectUri("http://127.0.0.1:8081")
                 .redirectUri("http://127.0.0.1:8081/login/oauth2/code/springoauth2")
+                .postLogoutRedirectUri("http://localhost:8080/")
                 .scope(OidcScopes.OPENID)
                 .scope(OidcScopes.PROFILE)
                 .clientSettings(ClientSettings.builder()
