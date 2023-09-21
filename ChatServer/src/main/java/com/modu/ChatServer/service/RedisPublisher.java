@@ -1,6 +1,8 @@
 package com.modu.ChatServer.service;
 
 import com.modu.ChatServer.domain.ChatMessage;
+import com.modu.ChatServer.dto.ChatMessageDto;
+import com.modu.ChatServer.repository.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,8 +16,18 @@ public class RedisPublisher {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic channelTopic;
+    private final ChatMessageRepository chatMessageRepository;
 
-    public void publish(ChatMessage message) {
+    public void publish(ChatMessageDto message) {
+
+        // DB에 메시지 저장
+        ChatMessage chatMessage = ChatMessage.builder()
+                .roomId(message.getRoomId())
+                .message(message.getMessage())
+                .writer(message.getWriter())
+                .build();
+
+        chatMessageRepository.save(chatMessage);
 
         // Redis Channel로 메시지 전송
         log.info("redis 채널로 발송할 메시지 -> {}", message.getMessage());

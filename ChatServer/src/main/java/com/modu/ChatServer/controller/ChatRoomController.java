@@ -2,6 +2,7 @@ package com.modu.ChatServer.controller;
 
 import com.modu.ChatServer.domain.ChatMessage;
 import com.modu.ChatServer.domain.ChatRoom;
+import com.modu.ChatServer.dto.ChatMessageDto;
 import com.modu.ChatServer.repository.ChatMessageRepository;
 import com.modu.ChatServer.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -43,14 +45,19 @@ public class ChatRoomController {
         ChatRoom room = chatRoomRepository.findById(roomId)
                 .orElseThrow(NullPointerException::new);
 
+        List<ChatRoom> rooms = chatRoomRepository.findAll();
+        model.addAttribute("rooms", rooms);
+
         // 이전 채팅 기록 TODO : html 코드 수정하기
-        List<ChatMessage> messages = chatMessageRepository.findByRoomId(roomId);
+        List<ChatMessageDto> messages = chatMessageRepository.findByRoomId(roomId)
+                .stream().map(ChatMessageDto::new).collect(Collectors.toList());
         model.addAttribute("messages", messages);
 
         model.addAttribute("room", room);
-        model.addAttribute("username", UUID.randomUUID().toString());
+
         // TODO : 실제 사용자 닉네임과 연동 생각하기. 현재는 입장할 때 username이 랜덤으로 생성됨
-        return "room";
+        model.addAttribute("username", UUID.randomUUID().toString());
+        return "room2";
     }
 
 

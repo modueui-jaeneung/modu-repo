@@ -1,5 +1,6 @@
 package com.modu.ChatServer.domain;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
@@ -10,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.time.LocalDateTime;
 
 @Getter @Setter
+@Builder
 @Document(collection = "message")
 public class ChatMessage {
 
@@ -22,8 +24,7 @@ public class ChatMessage {
     private String writer;
     private String message;
 
-    // TODO: LocalDateTime 필드를 유지하기 위해, 나중에 MessageDto 추가하기
-//    @CreatedDate
-//    @Field("created_at")
-//    private LocalDateTime createdAt;
+    @CreatedDate
+    @Field("created_at")
+    private LocalDateTime createdAt;
 }
