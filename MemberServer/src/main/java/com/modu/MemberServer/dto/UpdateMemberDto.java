@@ -6,9 +6,10 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class UpdateMemberDto {
-    String nickname;
-    String address;
+    String email;
     String password;
     String repeatPassword;
+    String nickname;
+    String address;
     String introduceMyself;
 }

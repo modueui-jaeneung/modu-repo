@@ -7,6 +7,7 @@ import com.modu.MemberServer.dto.UpdateMemberDto;
 import com.modu.MemberServer.entity.Member;
 import com.modu.MemberServer.entity.enums.SocialType;
 import com.modu.MemberServer.service.MemberService;
+import com.modu.MemberServer.utils.EncryptHelper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
+    private final EncryptHelper encryptHelper;
 
     // 회원가입 -> 성공 시 201
     @PostMapping("/members")
@@ -56,9 +58,23 @@ public class MemberController {
         return new ResponseEntity(profileResponseDto, HttpStatus.OK);
     }
 
+    // 회원정보 수정 페이지 띄울 때 보여줄 회원정보
+    @GetMapping("/members/info/{memberId}")
+    public ResponseEntity<MemberInfoDto> getMemberInfo(@PathVariable Long memberId) {
+        Member findMember = memberService.findById(memberId);
+
+        MemberInfoDto memberInfoDto = new MemberInfoDto(
+                findMember.getEmail(),
+                findMember.getNickname(),
+                findMember.getAddress(),
+                findMember.getIntroduceMyself()
+        );
+        return new ResponseEntity<>(memberInfoDto, HttpStatus.OK);
+    }
+
     // 회원정보 수정 (닉네임, 주소, 비밀번호, 자기소개 수정 가능. 이외의 것들은 수정 불가)
     @PutMapping("/members/{memberId}")
-    public ResponseEntity<Message> updateMember(@PathVariable Long memberId, @RequestBody UpdateMemberDto updateMemberDto) {
+    public ResponseEntity<Message> updateMember(@PathVariable Long memberId, @ModelAttribute UpdateMemberDto updateMemberDto) {
         memberService.updateMember(memberId, updateMemberDto);
         return new ResponseEntity<>(new Message("회원수정 성공!"), HttpStatus.CREATED);
     }
@@ -92,5 +108,14 @@ public class MemberController {
     public class LoginResponseDto {
         Long id;
         String encryptedPassword;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public class MemberInfoDto {
+        String email;
+        String nickname;
+        String address;
+        String introduceMyself;
     }
 }

@@ -1,11 +1,11 @@
-package com.modu.MemberServer.dto;
+package com.modu.ClientViewServer;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class SignUpDto {
+public class UpdateMemberDto {
 
     String email;
     String password;

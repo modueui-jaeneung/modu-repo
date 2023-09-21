@@ -12,4 +12,5 @@ public class SignUpDto {
     String repeatPassword;
     String nickname;
     String address;
+    String introduceMyself;
 }

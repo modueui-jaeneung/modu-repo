@@ -64,7 +64,7 @@ public class MemberService {
                 encryptHelper.encrypt(signUpDto.getPassword()),
                 signUpDto.getNickname(),
                 signUpDto.getAddress(),
-                "");
+                signUpDto.getIntroduceMyself());
         Member savedMember = memberRepository.save(member);
         return savedMember.getId();
     }
@@ -95,13 +95,19 @@ public class MemberService {
     // 회원수정
     @Transactional
     public Long updateMember(Long memberId, UpdateMemberDto updateMemberDto) {
-        // password와 repeatPassword가 맞는지 확인하기. (물론 화면 단에서 확인해서 거르겠지만, 서버단에서도 재확인하기)
+
+        // password 와 repeatPassword 가 맞는지 물론 화면 단에서 확인하고 요청했겠지만
+        // 서버단에서도 재확인하기
         if (!updateMemberDto.getPassword().equals(updateMemberDto.getRepeatPassword())) {
             throw new PasswordNotEqualException("비밀번호가 일치하지 않습니다.");
         }
 
-        // TODO 비밀번호 형식 검사하기
-
+        String password = updateMemberDto.getPassword();
+        // 비밀번호 유효성 검사
+        // 최소 8자, 최소 하나의 문자, 하나의 숫자 및 하나의 특수 문자
+        if (!password.matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@!%*#?&])[A-Za-z\\d@!%*#?&]{8,}$")) {
+            throw new PasswordNotSatisfiedException("비밀번호가 유효하지 않습니다. 최소 8자, 최소 하나의 문자, 하나의 숫자 및 하나의 특수 문자가 들어있어야 합니다.");
+        }
 
         Member member = findById(memberId);
         Member updateMember = member.updateMember(

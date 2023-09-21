@@ -65,7 +65,8 @@ public class MemberServiceTest {
                 "passsssssssss",
                 "pass",
                 "user",
-                "address~"
+                "address~",
+                "I love my body~"
         );
         assertThrows(PasswordNotEqualException.class, () -> memberService.signupLocal(signUpDto));
     }
@@ -79,7 +80,8 @@ public class MemberServiceTest {
                 "pass123!",
                 "pass123!",
                 "userrrrrr",
-                "addressssssss~"
+                "addressssssss~",
+                "I love my body~"
         );
         assertThrows(DuplicateMemberException.class, () -> memberService.signupLocal(signUpDto2));
     }
@@ -146,12 +148,14 @@ public class MemberServiceTest {
         Long memberId = memberService.signupLocal(signUpDto);
         Member findMember = memberService.findById(memberId);
 
+        String email = findMember.getEmail();
         String updateNickname = findMember.getNickname() + "~~~~~";
         String updatePassword = findMember.getPassword() + "~~~~~";
         String updateRepeatPassword = findMember.getPassword() + "~~~~~";
         String updateAddress = findMember.getAddress();
         String updateIntroduceMyself = findMember.getIntroduceMyself();
         UpdateMemberDto updateMemberDto = new UpdateMemberDto(
+                email,
                 updateNickname,
                 updateAddress,
                 updatePassword,
@@ -207,7 +211,8 @@ public class MemberServiceTest {
                 "pass123!",
                 "pass123!",
                 "user",
-                "address~"
+                "address~",
+                "I love my body~"
         );
     }
 }

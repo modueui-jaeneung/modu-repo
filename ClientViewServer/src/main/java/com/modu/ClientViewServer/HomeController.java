@@ -14,10 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -76,6 +74,7 @@ public class HomeController {
         map.put("repeatPassword", List.of(signUpDto.getRepeatPassword()));
         map.put("nickname", List.of(signUpDto.getNickname()));
         map.put("address", List.of(signUpDto.getAddress()));
+        map.put("introduceMyself", List.of(signUpDto.getIntroduceMyself()));
         String uriString = UriComponentsBuilder
                 .newInstance()
                 .scheme("http")
@@ -87,14 +86,80 @@ public class HomeController {
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<SignUpDto> entity = new HttpEntity<>(headers);
-        ResponseEntity<Message> response = restTemplate.exchange(uriString, HttpMethod.POST, entity, new ParameterizedTypeReference<>() {
-        });
 
-        if (response.getStatusCode() == HttpStatus.CREATED) {
+        ResponseEntity<Message> response;
+        try {
+            response = restTemplate.exchange(uriString, HttpMethod.POST, entity, new ParameterizedTypeReference<>() {});
+            if (response.getStatusCode() == HttpStatus.CREATED) {
+                return "index";
+            }
+        } catch (HttpClientErrorException e) {
+            log.error(e.getMessage());
+            return "signup";
+        }
+
+        return "signup";
+    }
+
+    @GetMapping("/updateInfo")
+    public String updateInfo(Model model) {
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        String uriString = UriComponentsBuilder.newInstance().
+                scheme("http")
+                .host("127.0.0.1")
+                .port(8083)
+                .path("/members/info/1")
+                .build().toUriString();
+
+        try {
+            ResponseEntity<MemberInfoResponseDto> response = restTemplate.exchange(uriString, HttpMethod.GET, entity, new ParameterizedTypeReference<>() {
+            });
+            if (response.getStatusCode() != HttpStatus.OK) {
+                return "index";
+            }
+
+            log.info("memberInfo={}", response.getBody());
+            model.addAttribute("memberInfo", response.getBody());
+
+            return "updateInfo";
+        } catch (HttpClientErrorException e) {
             return "index";
         }
-        return "signup";
+    }
 
+    @PostMapping("/updateInfo")
+    public String updateInfo(@ModelAttribute UpdateMemberDto updateMemberDto) {
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.put("email", List.of(updateMemberDto.getEmail()));
+        map.put("password", List.of(updateMemberDto.getPassword()));
+        map.put("repeatPassword", List.of(updateMemberDto.getRepeatPassword()));
+        map.put("nickname", List.of(updateMemberDto.getNickname()));
+        map.put("address", List.of(updateMemberDto.getAddress()));
+        map.put("introduceMyself", List.of(updateMemberDto.getIntroduceMyself()));
+        String uriString = UriComponentsBuilder
+                .newInstance()
+                .scheme("http")
+                .host("127.0.0.1")
+                .port(8083)
+                .path("/members/1")
+                .queryParams(map)
+                .build().toUriString();
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<SignUpDto> entity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<Message> response = restTemplate.exchange(uriString, HttpMethod.PUT, entity, new ParameterizedTypeReference<>() {
+            });
+            if (response.getStatusCode() == HttpStatus.CREATED) {
+                return "index";
+            }
+        } catch (HttpClientErrorException e) {
+            return "redirect:/updateInfo";
+        }
+        return "index";
     }
 
     @Data
@@ -102,5 +167,15 @@ public class HomeController {
     @NoArgsConstructor
     public static class Message {
         String message;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class MemberInfoResponseDto {
+        String email;
+        String nickname;
+        String address;
+        String introduceMyself;
     }
 }
