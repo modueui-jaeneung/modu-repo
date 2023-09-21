@@ -1,7 +1,7 @@
 package com.modu.ChatServer.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.modu.ChatServer.domain.ChatMessage;
+import com.modu.ChatServer.dto.ChatMessageDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
@@ -28,7 +28,7 @@ public class RedisSubscriber implements MessageListener {
             log.info("redis로 발행된 메시지 {}", message);
 
             // ChatMessage 객체로 매핑
-            ChatMessage chatMessage = objectMapper.readValue(message.toString(), ChatMessage.class);
+            ChatMessageDto chatMessage = objectMapper.readValue(message.toString(), ChatMessageDto.class);
 
             // WebSocket Session으로 roomId로 나눠서 메시지 push
             messageTemplate.convertAndSend("/topic/chat/room/" + chatMessage.getRoomId(), chatMessage);

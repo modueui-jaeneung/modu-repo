@@ -1,6 +1,5 @@
 package com.modu.ChatServer.controller;
 
-import com.modu.ChatServer.domain.ChatMessage;
 import com.modu.ChatServer.domain.ChatRoom;
 import com.modu.ChatServer.dto.ChatMessageDto;
 import com.modu.ChatServer.repository.ChatMessageRepository;
@@ -25,7 +24,7 @@ public class ChatRoomController {
     private final ChatMessageRepository chatMessageRepository;
     
     // 채팅방 생성 (MongoDB)
-    @PostMapping("/rooms")
+//    @PostMapping("/rooms")
     public String createRoom(@RequestBody ChatRoom room) {
         chatRoomRepository.save(room);
         return "redirect:/";
@@ -59,7 +58,6 @@ public class ChatRoomController {
         model.addAttribute("username", UUID.randomUUID().toString());
         return "room2";
     }
-
 
     // 채팅방 삭제
 }
