@@ -34,6 +34,9 @@ dependencies {
 	// spring data redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+	// redisTemplate 의 json serialize 문제 해결을 위한 의존성 추가 (LocalDateTime)
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
 	// swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 

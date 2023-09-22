@@ -31,7 +31,7 @@ public class RedisPublisher {
 
         // Redis Channel로 메시지 전송
         log.info("redis 채널로 발송할 메시지 -> {}", message.getMessage());
-        redisTemplate.convertAndSend(channelTopic.getTopic(), message);
+        redisTemplate.convertAndSend(channelTopic.getTopic(), new ChatMessageDto(chatMessage));
 
         // TODO : Mongo DB에 메시지 저장 로직을 여기에 넣을지
     }
