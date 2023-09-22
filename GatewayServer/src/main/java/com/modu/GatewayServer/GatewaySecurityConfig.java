@@ -21,6 +21,8 @@ public class GatewaySecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated());
 
+
+
         http.oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()));
 
         http.cors().configurationSource(corsConfigurationSource());

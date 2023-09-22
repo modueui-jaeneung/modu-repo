@@ -1,4 +1,4 @@
-package com.modu.GatewayServer;
+package com.modu.GatewayServer.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

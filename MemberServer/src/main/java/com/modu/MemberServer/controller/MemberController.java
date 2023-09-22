@@ -73,10 +73,10 @@ public class MemberController {
     }
 
     // 회원정보 수정 (닉네임, 주소, 비밀번호, 자기소개 수정 가능. 이외의 것들은 수정 불가)
-    @PutMapping("/members/{memberId}")
+    @PutMapping("/members/info/{memberId}")
     public ResponseEntity<Message> updateMember(@PathVariable Long memberId, @ModelAttribute UpdateMemberDto updateMemberDto) {
         memberService.updateMember(memberId, updateMemberDto);
-        return new ResponseEntity<>(new Message("회원수정 성공!"), HttpStatus.CREATED);
+        return new ResponseEntity<>(new Message("회원수정 성공!"), HttpStatus.OK);
     }
 
 //     회원탈퇴. soft delete 로서 Member의 isDeleted 필드를 1로 바꿀 것.

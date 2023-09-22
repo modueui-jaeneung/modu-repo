@@ -9,3 +9,6 @@ spring:
     cache: false
   mvc:
     static-path-pattern: /static/**
+
+kakao:
+  restApiKey: 62e3b482910ffeb59ad3b501b22cbf8b
