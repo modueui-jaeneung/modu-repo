@@ -300,39 +300,31 @@
                         </div>
 
                         <!-- 채팅방 목록 -->
-                        <!--                        <div class="chat-rooms mt-2 mb-0">-->
-                        <!--                            <a href="#" class="list-group-item list-group-item-action border-0">-->
-                        <!--                                <div class="badge bg-success float-right">5</div>-->
-                        <!--                                <div class="d-flex align-items-start">-->
-                        <!--                                    <img src="https://bootdey.com/img/Content/avatar/avatar5.png" class="rounded-circle mr-1" alt="Vanessa Tucker" width="40" height="40">-->
-                        <!--                                    <div class="flex-grow-1 ml-3">-->
-                        <!--                                        Vanessa Tucker-->
-                        <!--                                        <div class="small"><span class="fas fa-circle chat-online"></span> Online</div>-->
-                        <!--                                    </div>-->
-                        <!--                                </div>-->
-                        <!--                            </a>-->
-                        <!--                        </div>-->
-
-                        <ul class="list-unstyled chat-list mt-2 mb-0">
-
+                        <div class="chat-rooms mt-2 mb-0">
                             <!-- 샘플 데이터 -->
-                            <li class="clearfix active">
-                                <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">
-                                <div class="about">
-                                    <div class="name">상대방 닉네임</div>
-                                    <div class="status"><i class="fa fa-circle online"></i> online</div>
+                            <a href="#" class="list-group-item list-group-item-action border-0">
+                                <div class="badge bg-success float-right">5</div>
+                                <div class="d-flex align-items-start">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar5.png" class="rounded-circle mr-1" alt="Vanessa Tucker" width="40" height="40">
+                                    <div class="flex-grow-1 ml-3">
+                                        Vanessa Tucker
+                                        <div class="status"><i class="fa fa-circle online"></i> online</div>
+                                    </div>
                                 </div>
-                            </li>
+                            </a>
 
-                            <!-- 채팅방 -->
-                            <li th:each="room : ${rooms}" class="clearfix">
-                                <img src="https://bootdey.com/img/Content/avatar/avatar3.png" alt="avatar">
-                                <div class="about">
-                                    <div class="name" th:text="|${room.ownerId}|">Mike Thomas</div>
-                                    <div class="status"><i class="fa fa-circle online"></i> online</div>
+                            <!-- 채팅방 목록 -->
+                            <a th:each="room : ${rooms}" href="#"
+                               th:href="@{/chat/{id} (id=${room.roomId})}" class="list-group-item list-group-item-action border-0">
+                                <div class="d-flex align-items-start">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar5.png" class="rounded-circle mr-1" alt="Vanessa Tucker" width="40" height="40">
+                                    <div class="about">
+                                        <div class="name" th:text="|${room.ownerId}|">Mike Thomas</div>
+                                        <div class="status"><i class="fa fa-circle online"></i> online</div>
+                                    </div>
                                 </div>
-                            </li>
-                        </ul>
+                            </a>
+                        </div>
                     </div>
 
                     <div class="chat">
@@ -369,7 +361,7 @@
                                 <li th:each="message : ${messages}" class="clearfix">
                                     <div th:if="${message.writer} == ${username}" class="my-chatting">
                                         <div class="message-data">
-                                            <span class="message-data-time">10:12 AM, Today</span>
+                                            <span class="message-data-time" th:text="${message.createdAt}">10:12 AM, Today</span>
                                         </div>
                                         <div class="message my-message"
                                              th:text="|${message.writer} : ${message.message}|">
@@ -378,7 +370,7 @@
                                     </div>
                                     <div th:unless="${message.writer} == ${username}" class="other-chatting">
                                         <div class="message-data text-right">
-                                            <span class="message-data-time">10:10 AM, Today</span>
+                                            <span class="message-data-time" th:text="${message.createdAt}">10:10 AM, Today</span>
                                             <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar">
                                         </div>
                                         <div class="message other-message float-right"
@@ -421,7 +413,7 @@
 
 <script th:inline="javascript">
 
-    $(document).ready(function(){
+    $(function(){
 
         const socket = new SockJS('http://localhost:8085/ws')
         let stompClient = Stomp.over(socket)
@@ -438,17 +430,18 @@
                 const chatBody = JSON.parse(chat.body);
                 const writer = chatBody.writer
                 const message = chatBody.message
+                const createdAt = chatBody.createdAt
                 let str = ''
 
                 if(writer === username){ // 내 채팅
                     str = "<li class='clearfix'>"
-                    str += "<div class='message-data'><span class='message-data-time'>10:12 AM, Today</span></div>"
+                    str += "<div class='message-data'><span class='message-data-time'>" + createdAt + "</span></div>"
                     str += "<div class='message my-message'>" + writer + " : " + message + "</div></li>"
                     $("#msgArea").append(str);
                 }
                 else{ // 상대방 채팅
                     str = "<li class='clearfix'>"
-                    str += "<div class='message-data text-right'><span class='message-data-time'>10:10 AM, Today</span>"
+                    str += "<div class='message-data text-right'><span class='message-data-time'>" + createdAt + "</span>"
                     str += "<img src='https://bootdey.com/img/Content/avatar/avatar7.png' alt='avatar'></div>"
                     str += "<div class='message other-message float-right'>" + writer + " : " + message + "</div></li>"
                     $("#msgArea").append(str);
@@ -464,11 +457,18 @@
                 console.log(username + ":" + msg.value);
                 stompClient.send('/app/chat/message', {}, JSON.stringify({roomId: roomId, message: msg.value, writer: username}));
                 msg.value = '';
-
             });
 
+            <!-- client 에서 disconnect -->
+            function disconnect() {
+                if (stompClient !== null) {
+                    stompClient.disconnect(function() {
+                        console.log("Client disconnected");
+                    });
+                    stompClient = null;
+                }
+            }
         })
-
     })
 </script>
 
