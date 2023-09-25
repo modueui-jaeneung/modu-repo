@@ -11,4 +11,4 @@ spring:
     static-path-pattern: /static/**
 
 kakao:
-  restApiKey: 62e3b482910ffeb59ad3b501b22cbf8b
+  restApiKey: 2b2af5b76c8f927d2ab6a7aa6cccf840

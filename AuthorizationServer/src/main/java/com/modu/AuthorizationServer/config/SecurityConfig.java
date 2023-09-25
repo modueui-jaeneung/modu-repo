@@ -2,6 +2,7 @@ package com.modu.authorizationServer.config;
 
 import com.modu.authorizationServer.filter.EmailPasswordAuthenticationFilter;
 import com.modu.authorizationServer.provider.FormAuthenticationProvider;
+import com.modu.authorizationServer.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,6 +53,7 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
 
     private final FormAuthenticationProvider formAuthenticationProvider;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     @Order(1)
@@ -104,6 +106,11 @@ public class SecurityConfig {
                         .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/loginmvc")))
         ;
 
+        http
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+                                .userService(customOAuth2UserService)));
+
         http.addFilterBefore(emailPasswordAuthenticationFilter(), DefaultLoginPageGeneratingFilter.class);
 
         return http.build();
@@ -131,7 +138,7 @@ public class SecurityConfig {
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://127.0.0.1:8081")
+                .redirectUri("http://127.0.0.1:8081/")
                 .redirectUri("http://127.0.0.1:8081/login/oauth2/code/springoauth2")
                 .postLogoutRedirectUri("http://localhost:8080/")
                 .scope(OidcScopes.OPENID)

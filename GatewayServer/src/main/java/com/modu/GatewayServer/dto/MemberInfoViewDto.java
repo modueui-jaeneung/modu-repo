@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class MemberInfoViewDto {
     String email;
     String nickname;
+    String socialType;
     String address;
     String introduceMyself;
 }

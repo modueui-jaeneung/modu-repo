@@ -8,15 +8,17 @@
     <meta name="author" content="">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <title>프로필 수정</title>
-    <link rel="stylesheet" href="../static/css/signup.css">
-    <script src="../static/js/signup.js"></script>
+    <link rel="stylesheet" href="../../static/css/signup.css">
+    <script src="../../static/js/signup.js"></script>
+
+
 </head>
 <body>
 
     <!-- Navigation-->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container px-4 px-lg-5">
-            <a class="navbar-brand" th:href="@{/}">모두의 재능</a>
+            <a class="navbar-brand" th:href="@{/static}">모두의 재능</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
@@ -40,11 +42,12 @@
             <form class="container mt-3" th:method="post" th:action="@{/updateInfo}" th:object="${memberInfo}">
                 <div class="mb-3">
                     <input type="email" class="form-control" name="email" id="email" placeholder="이메일" th:field="*{email}" readonly>
+                    <input type="hidden" name="socialType" id="socialType" th:value="*{socialType}">
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 password">
                     <input type="password" class="form-control" name="password" id="password" placeholder="비밀번호 (영문, 숫자, 특수문자 8~30자)">
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 password">
                     <input type="password" class="form-control" name="repeatPassword" id="repeatPassword" placeholder="비밀번호 확인">
                 </div>
                 <div class="mb-3">
@@ -58,6 +61,7 @@
                 <div class="mb-3">
                     <input type="text" class="form-control" name="introduceMyself" id="introduceMyself" placeholder="간단한 자기소개" th:field="*{introduceMyself}">
                 </div>
+
                 <button type="submit" class="btn btn-primary btn-lg btn-block login-button">수정하기</button>
             </form>
         </section>
@@ -119,6 +123,20 @@
                 }
             }).open();
         }
+    </script>
+
+    <script th:inline="javascript">
+        function isPasswordNeed() {
+            const socialType = [[${memberInfo.socialType}]];
+            console.log(socialType);
+
+            if (socialType !== "LOCAL") {
+                document.querySelectorAll(".password").forEach((el) => {
+                    el.remove();
+                });
+            }
+        }
+        isPasswordNeed();
     </script>
 </body>
 </html>

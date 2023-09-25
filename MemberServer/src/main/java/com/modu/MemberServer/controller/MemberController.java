@@ -3,11 +3,13 @@ package com.modu.MemberServer.controller;
 
 import com.modu.MemberServer.dto.LoginRequestDto;
 import com.modu.MemberServer.dto.SignUpDto;
+import com.modu.MemberServer.dto.SignUpSocialDto;
 import com.modu.MemberServer.dto.UpdateMemberDto;
 import com.modu.MemberServer.entity.Member;
 import com.modu.MemberServer.entity.enums.SocialType;
 import com.modu.MemberServer.service.MemberService;
 import com.modu.MemberServer.utils.EncryptHelper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -16,19 +18,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
-    private final EncryptHelper encryptHelper;
 
     // 회원가입 -> 성공 시 201
     @PostMapping("/members")
     public ResponseEntity<Message> signup(@ModelAttribute SignUpDto signUpDto) {
-        memberService.signupLocal(signUpDto);
-        return new ResponseEntity<>(new Message("회원가입 완료!"), HttpStatus.CREATED);
+        Long memberId = memberService.signupLocal(signUpDto);
+        return new ResponseEntity<>(new Message(memberId.toString()), HttpStatus.CREATED);
+    }
+
+    // 소셜 회원가입 -> 성공 시 201
+    @PostMapping("/members/social")
+    public ResponseEntity<Message> signupSocial(@ModelAttribute SignUpSocialDto signUpSocialDto) {
+        Long memberId = memberService.signupSocial(signUpSocialDto);
+        return new ResponseEntity<>(new Message(memberId.toString()), HttpStatus.CREATED);
     }
 
     // 로그인에서 회원을 인증하기 위하여 이메일과 소셜타입으로 회원조회 (회원ID, 비밀번호 값 얻기)
@@ -66,6 +75,7 @@ public class MemberController {
         MemberInfoDto memberInfoDto = new MemberInfoDto(
                 findMember.getEmail(),
                 findMember.getNickname(),
+                findMember.getSocialType(),
                 findMember.getAddress(),
                 findMember.getIntroduceMyself()
         );
@@ -74,7 +84,23 @@ public class MemberController {
 
     // 회원정보 수정 (닉네임, 주소, 비밀번호, 자기소개 수정 가능. 이외의 것들은 수정 불가)
     @PutMapping("/members/info/{memberId}")
-    public ResponseEntity<Message> updateMember(@PathVariable Long memberId, @ModelAttribute UpdateMemberDto updateMemberDto) {
+    public ResponseEntity<Message> updateMember(@PathVariable Long memberId,
+                                                HttpServletRequest request,
+                                                @RequestParam String email,
+                                                @RequestParam String nickname,
+                                                @RequestParam String address,
+                                                @RequestParam String introduceMyself,
+                                                @RequestParam String socialType) {
+        String password;
+        String repeatPassword;
+        if (request.getParameterMap().containsKey("password") && request.getParameterMap().containsKey("repeatPassword")) {
+            password = request.getParameter("password");
+            repeatPassword = request.getParameter("repeatPassword");
+        } else {
+            password = UUID.randomUUID().toString();
+            repeatPassword = password;
+        }
+        UpdateMemberDto updateMemberDto = new UpdateMemberDto(email, socialType, password, repeatPassword, nickname, address, introduceMyself);
         memberService.updateMember(memberId, updateMemberDto);
         return new ResponseEntity<>(new Message("회원수정 성공!"), HttpStatus.OK);
     }
@@ -115,6 +141,7 @@ public class MemberController {
     public class MemberInfoDto {
         String email;
         String nickname;
+        SocialType socialType;
         String address;
         String introduceMyself;
     }

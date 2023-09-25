@@ -1,9 +1,6 @@
 package com.modu.MemberServer.exception.exhandler.advice;
 
-import com.modu.MemberServer.exception.DuplicateMemberException;
-import com.modu.MemberServer.exception.EmailFormatNotSatisfiedException;
-import com.modu.MemberServer.exception.PasswordNotEqualException;
-import com.modu.MemberServer.exception.PasswordNotSatisfiedException;
+import com.modu.MemberServer.exception.*;
 import com.modu.MemberServer.exception.exhandler.ErrorResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -56,6 +53,13 @@ public class ExControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(PasswordNotSatisfiedException.class)
     public ErrorResult passwordNotSatisfiedExHandle(PasswordNotSatisfiedException e) {
+        log.error("[exceptionHandle] ex", e);
+        return new ErrorResult(e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(InvalidSocialTypeException.class)
+    public ErrorResult invalidSocialTypeExHandle(InvalidSocialTypeException e) {
         log.error("[exceptionHandle] ex", e);
         return new ErrorResult(e.getMessage());
     }

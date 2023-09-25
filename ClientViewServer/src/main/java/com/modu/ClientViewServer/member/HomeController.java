@@ -1,4 +1,4 @@
-package com.modu.ClientViewServer;
+package com.modu.ClientViewServer.member;
 
 import com.modu.ClientViewServer.config.EnvironmentValueConfig;
 import jakarta.servlet.http.Cookie;
@@ -21,7 +21,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -33,10 +32,6 @@ public class HomeController {
 
     @GetMapping("/")
     public String index(HttpServletRequest request, HttpServletResponse response) {
-
-
-
-
         String tokenValue = request.getParameter("tokenValue");
         if (tokenValue != null) {
             log.info("tokenValue={}", tokenValue);
@@ -68,7 +63,7 @@ public class HomeController {
         String kakaoRestApiKey = environmentValueConfig.kakaoRestApiKey;
         model.addAttribute("kakaoRestApiKey", kakaoRestApiKey);
 
-        return "signup";
+        return "member/signup";
     }
 
     @PostMapping("/signup")
@@ -100,10 +95,10 @@ public class HomeController {
             }
         } catch (HttpClientErrorException e) {
             log.error(e.getMessage());
-            return "signup";
+            return "member/signup";
         }
 
-        return "signup";
+        return "member/signup";
     }
 
     /**
@@ -150,21 +145,29 @@ public class HomeController {
             String kakaoRestApiKey = environmentValueConfig.kakaoRestApiKey;
             model.addAttribute("kakaoRestApiKey", kakaoRestApiKey);
 
-            return "updateInfo";
+            return "member/updateInfo";
         } catch (HttpClientErrorException e) {
             return "index";
         }
     }
 
     @PostMapping("/updateInfo")
-    public String updateInfo(@ModelAttribute UpdateMemberDto updateMemberDto, HttpServletRequest request) {
+    public String updateInfo(HttpServletRequest request,
+                             @RequestParam String email,
+                             @RequestParam String nickname,
+                             @RequestParam String address,
+                             @RequestParam String introduceMyself,
+                             @RequestParam String socialType) {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.put("email", List.of(updateMemberDto.getEmail()));
-        map.put("password", List.of(updateMemberDto.getPassword()));
-        map.put("repeatPassword", List.of(updateMemberDto.getRepeatPassword()));
-        map.put("nickname", List.of(updateMemberDto.getNickname()));
-        map.put("address", List.of(updateMemberDto.getAddress()));
-        map.put("introduceMyself", List.of(updateMemberDto.getIntroduceMyself()));
+        map.put("email", List.of(email));
+        if (request.getParameterMap().containsKey("password") && request.getParameterMap().containsKey("repeatPassword")) {
+            map.put("password", List.of(request.getParameter("password")));
+            map.put("repeatPassword", List.of(request.getParameter("repeatPassword")));
+        }
+        map.put("nickname", List.of(nickname));
+        map.put("address", List.of(address));
+        map.put("introduceMyself", List.of(introduceMyself));
+        map.put("socialType", List.of(socialType));
         String uriString = UriComponentsBuilder
                 .newInstance()
                 .scheme("http")
@@ -204,12 +207,12 @@ public class HomeController {
 
     @GetMapping("/bookmark")
     public String bookmark() {
-        return "bookmark";
+        return "member/bookmark";
     }
 
     @GetMapping("/applyList")
     public String applyList() {
-        return "applyList";
+        return "member/applyList";
     }
 
     @Data
@@ -225,6 +228,7 @@ public class HomeController {
     public static class MemberInfoResponseDto {
         String email;
         String nickname;
+        String socialType;
         String address;
         String introduceMyself;
     }

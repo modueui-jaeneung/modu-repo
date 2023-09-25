@@ -39,3 +39,6 @@ out/
 ### private.pem, public.pem ###
 private.pem
 public.pem
+
+### application.yml ###
+src/main/resources/application.yml

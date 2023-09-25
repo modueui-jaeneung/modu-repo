@@ -4,6 +4,7 @@ import com.modu.GatewayServer.dto.MemberInfoViewDto;
 import com.modu.GatewayServer.dto.MessageDto;
 import com.modu.GatewayServer.dto.PostDto;
 import com.modu.GatewayServer.dto.UpdateMemberDto;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.message.Message;
@@ -16,10 +17,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -88,16 +86,25 @@ public class HomeController {
     }
 
     @PutMapping("/members/info")
-    public ResponseEntity<MessageDto> updateMemberInfo(@AuthenticationPrincipal Jwt jwt, @ModelAttribute UpdateMemberDto updateMemberDto) {
+    public ResponseEntity<MessageDto> updateMemberInfo(@AuthenticationPrincipal Jwt jwt,
+                                                       HttpServletRequest request,
+                                                       @RequestParam String email,
+                                                       @RequestParam String nickname,
+                                                       @RequestParam String address,
+                                                       @RequestParam String introduceMyself,
+                                                       @RequestParam String socialType) {
         int memberId = Integer.parseInt(jwt.getClaim("sub"));
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.put("email", List.of(updateMemberDto.getEmail()));
-        map.put("password", List.of(updateMemberDto.getPassword()));
-        map.put("repeatPassword", List.of(updateMemberDto.getRepeatPassword()));
-        map.put("nickname", List.of(updateMemberDto.getNickname()));
-        map.put("address", List.of(updateMemberDto.getAddress()));
-        map.put("introduceMyself", List.of(updateMemberDto.getIntroduceMyself()));
+        map.put("email", List.of(email));
+        if (request.getParameterMap().containsKey("password") && request.getParameterMap().containsKey("repeatPassword")) {
+            map.put("password", List.of(request.getParameter("password")));
+            map.put("repeatPassword", List.of(request.getParameter("repeatPassword")));
+        }
+        map.put("nickname", List.of(nickname));
+        map.put("address", List.of(address));
+        map.put("introduceMyself", List.of(introduceMyself));
+        map.put("socialType", List.of(socialType));
 
         String uriString = UriComponentsBuilder.newInstance()
                 .scheme("http")

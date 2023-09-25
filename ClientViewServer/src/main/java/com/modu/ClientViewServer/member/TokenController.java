@@ -1,4 +1,4 @@
-package com.modu.ClientViewServer;
+package com.modu.ClientViewServer.member;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

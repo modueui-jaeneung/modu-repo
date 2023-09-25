@@ -1,4 +1,4 @@
-package com.modu.ClientViewServer;
+package com.modu.ClientViewServer.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
